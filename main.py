@@ -7,7 +7,7 @@ import sys
 
 contraction = 0.9
 termination = 0.9999
-zero_loss = 0.001
+zero_loss = 0.0001
 
 model = Model('MNIST')
 
@@ -19,6 +19,7 @@ for iter in range(1000):
     state_dict = torch.load('model.pth')
     model.load_state_dict(state_dict['model'])
     weight_contraction(model, contraction)
+    model = model.to(device)
     model.set_optimizer(0.1)
 
     # train the network
