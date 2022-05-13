@@ -31,7 +31,7 @@ for iter in range(1000):
         if loss <= zero_loss:
             angle = angle_of_gradient(model)
         sys.stdout.write("try %d, running steps: %d, loss: %.7f  \r" % (iter, n_step, loss))
-    print("try %d, runned steps: %d, train loss: %.5f, angle: %.5f," % (iter, n_step, loss, angle),
+    print("try %d, runned steps: %d, train loss: %.7f, angle: %.5f," % (iter, n_step, loss, angle),
         "weight sum: %.5f, test accuracy: %.2f %%" % (norm_of_weight(model), 100.*model.test(device)))
     # print('try', iter+1, ': ', torch.cat([param.view(-1) for param in model.parameters()]))
     if angle > termination:
