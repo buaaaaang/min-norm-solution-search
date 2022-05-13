@@ -7,20 +7,19 @@ import sys
 
 contraction = 0.9
 termination = 0.9999
-zero_loss = 0.01
+zero_loss = 0.00001
 
 model = Model('MNIST')
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 for iter in range(1000):
-    print('try ', iter)
     # prepare contracted model with new optimizer
     torch.save({'model': model.state_dict()}, 'model.pth')
     state_dict = torch.load('model.pth')
     model.load_state_dict(state_dict['model'])
     weight_contraction(model, contraction)
-    model.set_optimizer(0.01)
+    model.set_optimizer(0.1)
 
     # train the network
     loss = zero_loss + 1
@@ -31,11 +30,10 @@ for iter in range(1000):
         loss = model.step(device)
         if loss <= zero_loss:
             angle = angle_of_gradient(model)
-        sys.stdout.write("running steps: %d, loss: %.5f  \r" % (n_step, loss))
-    print("runned steps: %d, final loss: %.5f" % (n_step, loss))
-    print("angle: %.5f, weight_sum: %.5f" % (angle, norm_of_weight(model)))
+        sys.stdout.write("try %d, running steps: %d, loss: %.7f  \r" % (iter, n_step, loss))
+    print("try %d, runned steps: %d, train loss: %.5f, angle: %.5f," % (iter, n_step, loss, angle),
+        "weight sum: %.5f, test accuracy: %.2f %%" % (norm_of_weight(model), 100.*model.test(device)))
     # print('try', iter+1, ': ', torch.cat([param.view(-1) for param in model.parameters()]))
-    model.test(device)
     if angle > termination:
         print('angle got close enough.')
         break

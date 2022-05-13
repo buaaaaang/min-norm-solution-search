@@ -69,8 +69,8 @@ class MNISTClassifier(BaseModel):
         self.train_loader = DataLoader(dataset=self.train_data, batch_size=60, shuffle=True)
         self.test_loader = DataLoader(dataset=self.test_data, batch_size=100, shuffle=True)
         
-        self.layer_list.append(nn.Linear(784, 1024, False))
-        self.layer_list.append(nn.Linear(1024, 10, False))
+        self.layer_list.append(nn.Linear(784, 2048, False))
+        self.layer_list.append(nn.Linear(2048, 10, False))
 
     def forward(self, x):
         x = x.view(x.size(0), -1)
@@ -105,7 +105,7 @@ class MNISTClassifier(BaseModel):
                 total += len(target)
                 correct += (preds==target).sum().item()
                 
-            print('Test Accuracy: ', 100.*correct/total, '%')
+        return correct/total
 
 
 
