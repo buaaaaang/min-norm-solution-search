@@ -64,7 +64,7 @@ class MNISTClassifier(BaseModel):
             transform = transfroms.Compose([transfroms.ToTensor()]))
         self.test_data = datasets.MNIST(root = './', train=False, download=True, 
             transform = transfroms.Compose([transfroms.ToTensor()]))
-        self.train_data, _ = random_split(train_data, [60, len(train_data)-60])
+        self.train_data, _ = random_split(train_data, [600, len(train_data)-600])
         print('reduced train data from ', len(train_data), ' to ', len(self.train_data))
         self.train_loader = DataLoader(dataset=self.train_data, batch_size=60, shuffle=True)
         self.test_loader = DataLoader(dataset=self.test_data, batch_size=100, shuffle=True)
