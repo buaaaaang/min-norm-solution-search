@@ -64,9 +64,10 @@ class MNISTClassifier(BaseModel):
             transform = transfroms.Compose([transfroms.ToTensor()]))
         self.test_data = datasets.MNIST(root = './', train=False, download=True, 
             transform = transfroms.Compose([transfroms.ToTensor()]))
-        self.train_data, _ = random_split(train_data, [600, len(train_data)-600])
-        print('reduced train data from ', len(train_data), ' to ', len(self.train_data))
-        self.train_loader = DataLoader(dataset=self.train_data, batch_size=60, shuffle=True)
+        n_reduced = 256
+        self.train_data, _ = random_split(train_data, [n_reduced, len(train_data)-n_reduced])
+        print('reduced train data from', len(train_data), 'to', len(self.train_data))
+        self.train_loader = DataLoader(dataset=self.train_data, batch_size=64, shuffle=True)
         self.test_loader = DataLoader(dataset=self.test_data, batch_size=100, shuffle=True)
         
         self.layer_list.append(nn.Linear(784, 2048, False))
@@ -97,15 +98,22 @@ class MNISTClassifier(BaseModel):
         with torch.no_grad():
             correct = 0
             total = 0
+            avg_loss = 0
             for data, target in self.test_loader:
+                # data = data.to(device).float()
+                # target = target.to(device)
+                # output = self(data)
+                # preds = torch.max(output.data, 1)[1]
+                # total += len(target)
+                # correct += (preds==target).sum().item()
+
                 data = data.to(device).float()
                 target = target.to(device)
+                target = F.one_hot(target, num_classes=10).float()
                 output = self(data)
-                preds = torch.max(output.data, 1)[1]
-                total += len(target)
-                correct += (preds==target).sum().item()
-                
-        return correct/total
+                loss = F.mse_loss(output, target)
+                avg_loss += loss.item()/len(self.train_loader)
+            return avg_loss
 
 
 

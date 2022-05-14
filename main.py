@@ -5,9 +5,9 @@ from model import Model
 from util import *
 import sys
 
-contraction = 0.9
+contraction = 0.99
 termination = 0.9999
-zero_loss = 0.0001
+zero_loss = 0.000001
 
 model = Model('MNIST')
 
@@ -31,9 +31,10 @@ for iter in range(1000):
         loss = model.step(device)
         if loss <= zero_loss:
             angle = angle_of_gradient(model)
-        sys.stdout.write("try %d, running steps: %d, loss: %.7f  \r" % (iter, n_step, loss))
-    print("try %d, runned_steps: %d, train_loss: %.7f, angle: %.5f," % (iter, n_step, loss, angle),
-        "weight_sum: %.5f, test_accuracy: %.2f %%" % (norm_of_weight(model), 100.*model.test(device)))
+        sys.stdout.write("try %d, running steps: %d, loss: %.9f  \r" % (iter, n_step, loss))
+    test = model.test(device)
+    print("try %d, runned_steps: %d, train_loss: %.9f, angle: %.5f," % (iter, n_step, loss, angle),
+        "weight_sum: %.5f, test_loss: %.9f" % (norm_of_weight(model), model.test(device)))
     # print('try', iter+1, ': ', torch.cat([param.view(-1) for param in model.parameters()]))
     if angle > termination:
         print('angle got close enough.')
