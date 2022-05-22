@@ -1,15 +1,26 @@
 import torch
 from torch import nn
 
-from model import Model
 from util import *
 import sys
+from model import SimpleModel
+from model_MNIST import MNISTClassifier
+from model_student import Student
 
-contraction = 0.99
+
+def Model(type, config=None):
+    if type == 'simple':
+        return SimpleModel()
+    if type == 'MNIST':
+        return MNISTClassifier()
+    if type == 'student':
+        return Student()
+
+contraction = 0.98
 termination = 0.9999
-zero_loss = 0.000001
+zero_loss = 0.00001
 
-model = Model('MNIST')
+model = Model('student')
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -30,11 +41,14 @@ for iter in range(1000):
         n_step += 1
         loss = model.step(device)
         if loss <= zero_loss:
-            angle = angle_of_gradient(model)
+            #angle = angle_of_gradient(model)
+            angle = 0
         sys.stdout.write("try %d, running steps: %d, loss: %.9f  \r" % (iter, n_step, loss))
     test = model.test(device)
     print("try %d, runned_steps: %d, train_loss: %.9f, angle: %.5f," % (iter, n_step, loss, angle),
         "weight_sum: %.5f, test_loss: %.9f" % (norm_of_weight(model), model.test(device)))
+    if (iter %10 == 0):
+        model.draw_weights()
     # print('try', iter+1, ': ', torch.cat([param.view(-1) for param in model.parameters()]))
     if angle > termination:
         print('angle got close enough.')
