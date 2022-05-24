@@ -2,7 +2,7 @@ from util import *
 import torch
 
 contraction = 0.98
-descent_rate = 5
+descent_rate = 1
 
 
 def Approach(kind):
@@ -25,9 +25,12 @@ class weight_contraction_optimizer():
 class vertical_gradient_optimizer():
     def __init__(self, _descent_rate):
         self.descent_rate = _descent_rate
-        self.n_step = 1
+        self.n_step = 0
 
     def step(self, model):
+        if self.n_step == 0:
+            self.n_step += 1
+            return
         shape = []
         param_index = [0]
         param = []
@@ -46,7 +49,7 @@ class vertical_gradient_optimizer():
         direction = param - (torch.inner(grad, param) /
                              torch.inner(grad, grad)) * grad
         param = param - direction * self.descent_rate / \
-            self.n_step / torch.norm(direction)
+            self.n_step ** 0.1 / torch.norm(direction)
         self.n_step += 1
 
         for i in range(len(model.layer_list)):

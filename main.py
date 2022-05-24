@@ -10,7 +10,7 @@ contraction = 0.98
 zero_loss = 0.00001
 
 model = Model('student')
-approach = Approach('vertical_descent')
+approach = Approach('vertical_descent') #Approach('contraction') #Approach('vertical_descent')
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -38,5 +38,5 @@ for iter in range(1000):
     test = model.test(device)
     print("try %d, run_steps: %d, train_loss: %.9f, angle: %.5f," % (iter, n_step, loss, angle),
           "weight_sum: %.5f, test_loss: %.9f" % (norm_of_weight(model), model.test(device)))
-    if (iter % 10 == 0):
+    if (iter % 3 == 0):
         model.draw_weights()

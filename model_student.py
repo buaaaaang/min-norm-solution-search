@@ -31,12 +31,12 @@ class Student(BaseModel):
         self.teacher = Teacher()
         teacher_state_dict = torch.load('teacher.pth')
         self.teacher.load_state_dict(teacher_state_dict['model'])
-        n_train_data = 15
+        n_train_data = 15 #200 #15
         with torch.no_grad():
             self.train_input = nn.functional.normalize(
                 torch.randn((n_train_data, 2)))
             self.train_output = self.teacher(self.train_input)
-        n_hidden_nodes = 20
+        n_hidden_nodes = 20 #200 #20
         self.layer_list.append(nn.Linear(2, n_hidden_nodes, False))
         self.layer_list.append(nn.Linear(n_hidden_nodes, 1, False))
 
@@ -71,7 +71,7 @@ class Student(BaseModel):
                      [0, parent_weight1[i][1] * abs(parent_weight2[0][i])], color="black")
         student_weight1 = self.layer_list[0].weight.detach().numpy()
         student_weight2 = self.layer_list[1].weight.detach().numpy()
-        enlarge = 1.5
+        enlarge = 10
         for i in range(student_weight1.shape[0]):
             if student_weight2[0][i] > 0:
                 plt.scatter(student_weight1[i][0] * abs(student_weight2[0][i]) * enlarge,
