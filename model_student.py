@@ -71,7 +71,7 @@ class Student(BaseModel):
                      [0, parent_weight1[i][1] * abs(parent_weight2[0][i])], color="black")
         student_weight1 = self.layer_list[0].weight.detach().numpy()
         student_weight2 = self.layer_list[1].weight.detach().numpy()
-        enlarge = self.n_hidden_nodes / 5. / 3.
+        enlarge = self.n_hidden_nodes / 20.
         for i in range(student_weight1.shape[0]):
             if student_weight2[0][i] > 0:
                 plt.scatter(student_weight1[i][0] * abs(student_weight2[0][i]) * enlarge,
