@@ -11,11 +11,11 @@ os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 class Teacher(nn.Module):
     def __init__(self):
         super(Teacher, self).__init__()
-        self.layer1 = nn.Linear(2, 3, False)
-        self.layer2 = nn.Linear(3, 1, False)
+        self.layer1 = nn.Linear(2, 1, False)
+        self.layer2 = nn.Linear(1, 1, False)
         w1 = self.layer1.weight.detach().numpy()
         with torch.no_grad():
-            for i in range(3):
+            for i in range(1):
                 self.layer2.weight[0, i] = self.layer2.weight[0, i] / (
                     (w1[i][0] ** 2 + w1[i][1] ** 2) ** 0.5 * abs(self.layer2.weight[0, i]))
 
@@ -24,18 +24,18 @@ class Teacher(nn.Module):
         return self.layer2(x)
 
 
-class Student(BaseModel):
+class SimpleStudent(BaseModel):
     def __init__(self):
-        super(Student, self).__init__()
+        super(SimpleStudent, self).__init__()
         self.teacher = Teacher()
-        teacher_state_dict = torch.load('teacher_LSH.pth')
+        teacher_state_dict = torch.load('simple_teacher.pth')
         self.teacher.load_state_dict(teacher_state_dict['model'])
-        self.n_train_data = 15 #200 #15
+        self.n_train_data = 200 #200 #15
         with torch.no_grad():
             self.train_input = nn.functional.normalize(
                 torch.randn((self.n_train_data, 2)))
             self.train_output = self.teacher(self.train_input)
-        self.n_hidden_nodes = 20 #200 #20
+        self.n_hidden_nodes = 1 #200 #20
         self.layer_list.append(nn.Linear(2, self.n_hidden_nodes, False))
         self.layer_list.append(nn.Linear(self.n_hidden_nodes, 1, False))
         for layer in self.layer_list:
@@ -93,7 +93,7 @@ class Student(BaseModel):
 
 if __name__ == '__main__':
     teacher = Teacher()
-    torch.save({'model': teacher.state_dict()}, 'teacher.pth')
+    torch.save({'model': teacher.state_dict()}, 'simple_teacher.pth')
 
-    model = Student()
+    model = SimpleStudent()
     model.draw_weights()

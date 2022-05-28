@@ -6,10 +6,9 @@ from util import *
 from model import Model
 from approach import Approach
 
-contraction = 0.98
 zero_loss = 0.00001
 
-model = Model('student')
+model = Model('simple_student')
 approach = Approach('vertical_descent') #Approach('contraction') #Approach('vertical_descent')
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -21,7 +20,7 @@ for iter in range(1000):
     # model.load_state_dict(state_dict['model'])
     approach.step(model)
     model = model.to(device)
-    model.set_optimizer(0.1,decay=1e-3)
+    model.set_optimizer(0.1, decay=0.00009)
 
     # train the network
     loss = zero_loss + 1
