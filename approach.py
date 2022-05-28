@@ -46,10 +46,14 @@ class vertical_gradient_optimizer():
         param = torch.cat(param)
         grad = torch.cat(grad)
 
+        if torch.inner(grad, grad) == 0:
+            print("zero gradient")
+            return
+
         direction = param - (torch.inner(grad, param) /
                              torch.inner(grad, grad)) * grad
         param = param - direction * self.descent_rate / \
-            self.n_step ** 0.1 / torch.norm(direction)
+            self.n_step ** 0.5 / torch.norm(direction)
         self.n_step += 1
 
         for i in range(len(model.layer_list)):

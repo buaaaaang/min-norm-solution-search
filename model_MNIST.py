@@ -29,8 +29,9 @@ class MNISTClassifier(BaseModel):
 
     def forward(self, x):
         x = x.view(x.size(0), -1)
-        x = F.relu(self.layer_list[0](x))
-        x = self.layer_list[1](x)
+        for i in range(len(self.layer_list) - 1):
+            x = F.relu(self.layer_list[i](x))
+        x = self.layer_list[len(self.layer_list) - 1](x)
         return x
 
     def step(self, device):

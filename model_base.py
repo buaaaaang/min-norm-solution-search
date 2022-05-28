@@ -7,11 +7,11 @@ class BaseModel(nn.Module):
         self.optimizer = None
         self.layer_list = nn.ModuleList()
 
-    def set_optimizer(self, lr=0.001, type='SGD'):
+    def set_optimizer(self, lr=0.001, type='SGD', decay=0):
         if (type == 'SGD'):
-            self.optimizer = torch.optim.SGD(self.parameters(), lr=lr)
+            self.optimizer = torch.optim.SGD(self.parameters(), lr=lr, weight_decay=decay)
         elif (type == 'ADAM'):
-            self.optimizer = torch.optim.Adam(self.parameters(), lr=lr)
+            self.optimizer = torch.optim.Adam(self.parameters(), lr=lr,weight_decay=decay)
         else:
             print(type, 'is not supported')
             raise ValueError()
@@ -20,7 +20,10 @@ class BaseModel(nn.Module):
         raise NotImplementedError()
 
     def test(self, device):
-        raise NotImplementedError()
+        return 0
+
+    def draw_weights(self):
+        return 0
 
 class SimpleModel(BaseModel):
     def __init__(self):
@@ -28,7 +31,7 @@ class SimpleModel(BaseModel):
         self.layer_list.append(nn.Linear(1, 1, False))
         self.layer_list.append(nn.Linear(1, 1, False))
         nn.init.constant_(self.layer_list[0].weight, 0.1)
-        nn.init.constant_(self.layer_list[1].weight, 10.0)
+        nn.init.constant_(self.layer_list[1].weight, 10.1)
 
     def forward(self, x):
         x = self.layer_list[0](x)
@@ -44,6 +47,7 @@ class SimpleModel(BaseModel):
         return loss[0]
 
     def test(self, device):
-        return 1
+        print("weight are %.5f, %.5f" % (self.layer_list[0].weight[0,0], self.layer_list[1].weight[0,0]))
+        return 0
 
 

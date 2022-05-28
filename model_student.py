@@ -8,7 +8,6 @@ import random
 import os
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
-
 class Teacher(nn.Module):
     def __init__(self):
         super(Teacher, self).__init__()
@@ -29,16 +28,18 @@ class Student(BaseModel):
     def __init__(self):
         super(Student, self).__init__()
         self.teacher = Teacher()
-        teacher_state_dict = torch.load('teacher.pth')
+        teacher_state_dict = torch.load('teacher_strange.pth')
         self.teacher.load_state_dict(teacher_state_dict['model'])
-        self.n_train_data = 15 #200 #15
+        self.n_train_data = 100 #200 #15
         with torch.no_grad():
             self.train_input = nn.functional.normalize(
                 torch.randn((self.n_train_data, 2)))
             self.train_output = self.teacher(self.train_input)
-        self.n_hidden_nodes = 20 #200 #20
+        self.n_hidden_nodes = 100 #200 #20
         self.layer_list.append(nn.Linear(2, self.n_hidden_nodes, False))
         self.layer_list.append(nn.Linear(self.n_hidden_nodes, 1, False))
+        for layer in self.layer_list:
+            torch.nn.init.normal_(layer.weight, mean=0, std=0.5)
 
     def forward(self, x):
         x = F.relu(self.layer_list[0](x))
@@ -83,15 +84,16 @@ class Student(BaseModel):
                             student_weight1[i][1] *
                             abs(student_weight2[0][i]) * enlarge,
                             color='blue', s=5)
-        plt.xlim(-1, 1)
-        plt.ylim(-1, 1)
+        plt.xlim(-1.1, 1.1)
+        plt.ylim(-1.1, 1.1)
+        plt.rcParams["figure.figsize"] = (5,5)
         plt.show(block=False)
         plt.pause(0.3)
 
 
 if __name__ == '__main__':
-    #teacher = Teacher()
-    #torch.save({'model': teacher.state_dict()}, 'teacher.pth')
+    teacher = Teacher()
+    torch.save({'model': teacher.state_dict()}, 'teacher.pth')
 
     model = Student()
     model.draw_weights()
