@@ -18,6 +18,8 @@ class Teacher(nn.Module):
             for i in range(1):
                 self.layer2.weight[0, i] = self.layer2.weight[0, i] / (
                     (w1[i][0] ** 2 + w1[i][1] ** 2) ** 0.5 * abs(self.layer2.weight[0, i]))
+        self.layer1.weight = torch.nn.Parameter(torch.FloatTensor([[1.,0.]]))
+        self.layer2.weight = torch.nn.Parameter(torch.FloatTensor([[1.]]))
 
     def forward(self, x):
         x = F.relu(self.layer1(x))

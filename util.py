@@ -8,7 +8,7 @@ def angle_of_gradient(model):
 
 
 def norm_of_weight(model):
-    param = torch.cat([param.view(-1) for param in model.parameters()])
+    param = torch.cat([layer.weight.view(-1) for layer in model.layer_list])
     return param.pow(2).sum().pow(0.5).item()
 
 def norm_of_weight_for_student(model):
@@ -18,7 +18,6 @@ def norm_of_weight_for_student(model):
     for i in range(l1.shape[0]):
         norm += l1[i,:].pow(2).sum().pow(0.5).item() * abs(l2[0,i])
     return norm
-
 
 def tensor_size(t):
     shape = t.shape

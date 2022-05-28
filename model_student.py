@@ -28,14 +28,14 @@ class Student(BaseModel):
     def __init__(self):
         super(Student, self).__init__()
         self.teacher = Teacher()
-        teacher_state_dict = torch.load('teacher_LSH.pth')
+        teacher_state_dict = torch.load('teacher_bad_regularization.pth')
         self.teacher.load_state_dict(teacher_state_dict['model'])
         self.n_train_data = 15 #200 #15
         with torch.no_grad():
             self.train_input = nn.functional.normalize(
                 torch.randn((self.n_train_data, 2)))
             self.train_output = self.teacher(self.train_input)
-        self.n_hidden_nodes = 20 #200 #20
+        self.n_hidden_nodes = 100 #200 #20
         self.layer_list.append(nn.Linear(2, self.n_hidden_nodes, False))
         self.layer_list.append(nn.Linear(self.n_hidden_nodes, 1, False))
         for layer in self.layer_list:

@@ -2,7 +2,7 @@ from util import *
 import torch
 
 contraction = 0.98
-descent_rate = 1
+descent_rate = 0.5
 
 
 def Approach(kind):
