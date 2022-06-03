@@ -31,7 +31,7 @@ for iter in range(100):
             "try %d, running steps: %d, loss: %.9f \r" % (iter, n_step, loss))
     test = model.test(device)
     print("try %d, run_steps: %d, train_loss: %.9f," % (iter, n_step, loss),
-          "squarted_weight_sum: %.5f, test_loss: %.9f, angle: %.5f" % (norm_of_weight(model)**2, test, angle))
+          "squared_weight_sum: %.5f, test_loss: %.9f, angle: %.5f" % (norm_of_weight(model)**2, test, angle))
     #print("norm of weight of student %.5f" % norm_of_weight_for_student(model))
     if (iter % 3 == 0):
         #model.draw_weights()
