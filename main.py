@@ -13,10 +13,10 @@ approach = Approach('vertical_descent') #Approach('contraction') #Approach('vert
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-for iter in range(1000):
+for iter in range(100):
     approach.step(model)
     model = model.to(device)
-    model.set_optimizer(0.1, decay=0.0007)
+    model.set_optimizer(0.1) #model.set_optimizer(0.1, decay=0.0007)
 
     # train the network
     loss = zero_loss + 1
@@ -34,4 +34,5 @@ for iter in range(1000):
           "squarted_weight_sum: %.5f, test_loss: %.9f, angle: %.5f" % (norm_of_weight(model)**2, test, angle))
     #print("norm of weight of student %.5f" % norm_of_weight_for_student(model))
     if (iter % 3 == 0):
-        model.draw_weights()
+        #model.draw_weights()
+        model.save_weights(iter)

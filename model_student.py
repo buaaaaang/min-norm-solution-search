@@ -11,8 +11,9 @@ os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 class Teacher(nn.Module):
     def __init__(self):
         super(Teacher, self).__init__()
-        self.layer1 = nn.Linear(2, 3, False)
-        self.layer2 = nn.Linear(3, 1, False)
+        self.n_hidden_nodes = 3
+        self.layer1 = nn.Linear(2, self.n_hidden_nodes, False)
+        self.layer2 = nn.Linear(self.n_hidden_nodes, 1, False)
         w1 = self.layer1.weight.detach().numpy()
         with torch.no_grad():
             for i in range(3):
@@ -28,9 +29,9 @@ class Student(BaseModel):
     def __init__(self):
         super(Student, self).__init__()
         self.teacher = Teacher()
-        teacher_state_dict = torch.load('teacher_bad_regularization.pth')
+        teacher_state_dict = torch.load('teacher%d.pth' %(self.teacher.n_hidden_nodes))
         self.teacher.load_state_dict(teacher_state_dict['model'])
-        self.n_train_data = 15 #200 #15
+        self.n_train_data = 100 #200 #15
         with torch.no_grad():
             self.train_input = nn.functional.normalize(
                 torch.randn((self.n_train_data, 2)))
@@ -90,10 +91,38 @@ class Student(BaseModel):
         plt.show(block=False)
         plt.pause(0.3)
 
+    def save_weights(self, iter=0):
+        parent_weight1 = self.teacher.layer1.weight.detach().numpy()
+        parent_weight2 = self.teacher.layer2.weight.detach().numpy()
+        for i in range(parent_weight1.shape[0]):
+            plt.plot([0, parent_weight1[i][0] * abs(parent_weight2[0][i])],
+                     [0, parent_weight1[i][1] * abs(parent_weight2[0][i])], color="black")
+        student_weight1 = self.layer_list[0].weight.detach().numpy()
+        student_weight2 = self.layer_list[1].weight.detach().numpy()
+        enlarge = self.n_hidden_nodes / 30.
+        for i in range(student_weight1.shape[0]):
+            if student_weight2[0][i] > 0:
+                plt.scatter(student_weight1[i][0] * abs(student_weight2[0][i]) * enlarge,
+                            student_weight1[i][1] *
+                            abs(student_weight2[0][i]) * enlarge,
+                            color='red', s=5)
+            else:
+                plt.scatter(student_weight1[i][0] * abs(student_weight2[0][i]) * enlarge,
+                            student_weight1[i][1] *
+                            abs(student_weight2[0][i]) * enlarge,
+                            color='blue', s=5)
+        plt.xlim(-1.1, 1.1)
+        plt.ylim(-1.1, 1.1)
+        plt.rcParams["figure.figsize"] = (5,5)
+        path = 'results/%dneurons_n%d_m%d' %(self.teacher.n_hidden_nodes, self.n_train_data, self.n_hidden_nodes)
+        os.makedirs(path, exist_ok=True)
+        plt.savefig(path + '/fig%d.png' %(iter), dpi=300)
+        plt.close()
+
 
 if __name__ == '__main__':
     teacher = Teacher()
-    torch.save({'model': teacher.state_dict()}, 'teacher.pth')
+    torch.save({'model': teacher.state_dict()}, 'teacher%d.pth' %(teacher.n_hidden_nodes))
 
     model = Student()
     model.draw_weights()
